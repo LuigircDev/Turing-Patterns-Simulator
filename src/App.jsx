@@ -1,46 +1,64 @@
-import { useRef, useState } from "react";
-import { useReactionDiffusion } from "./hooks/useReactionDiffusion";
+import { useRef, useState, useEffect } from "react";
+import { useReactionDiffusionGPU, defaultColor, funkyColor } from "./hooks/useGPUReactionDiffusion";
 
 function App() {
   const canvasRef = useRef(null);
   const [feed, setFeed] = useState(0.055);
   const [kill, setKill] = useState(0.062);
-  const [speed, setSpeed] = useState(1);
   const [canvasSize, setCanvasSize] = useState(400);
-  const [colorFunc, setColorFunc] = useState(defaultColor);
+  const [speed, setSpeed] = useState(1);
+  const [colorMode, setColorMode] = useState("default");
+  const [resetTrigger, setResetTrigger] = useState(0); // Nuevo estado para forzar reinicio
+  
+  const { resetGrid } = useReactionDiffusionGPU(
+    canvasRef, 
+    canvasSize, 
+    canvasSize, 
+    feed, 
+    kill, 
+    colorMode === "funky" ? funkyColor : defaultColor,
+    speed
+  );
 
-  const { resetGrid } = useReactionDiffusion(canvasRef, canvasSize, canvasSize, feed, kill, colorFunc, speed);
-
+  // Llamamos a resetGrid cuando cambia resetTrigger
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      resetGrid();
+    }
+  }, [resetTrigger, resetGrid]);
+  
+  const reset = () => {
+    // Incrementar el trigger para forzar el reinicio
+    setResetTrigger(prev => prev + 1);
+  };
+  
   const randomize = () => {
+    // Genera nuevos parámetros aleatorios y reinicia
     setFeed(Math.random() * 0.09 + 0.01);
     setKill(Math.random() * 0.04 + 0.03);
-    resetGrid();
+    setResetTrigger(prev => prev + 1);
   };
 
-  const reset = () => {
-    resetGrid();
-  };
-
-  const biggerCanvas = () => {
+  const toggleSize = () => {
     setCanvasSize(prev => (prev === 200 ? 600 : 200));
   };
 
   const toggleColor = () => {
-    setColorFunc(prev => (prev === defaultColor ? funkyColor : defaultColor));
+    setColorMode(prev => (prev === "default" ? "funky" : "default"));
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-900 flex flex-col items-center justify-center p-8 gap-8">
       <h1 className="text-4xl font-mono text-white">
-        Turing Patterns Simulator 🎨
+        Turing Patterns Simulator 🎨 (GPU Edition)
       </h1>
 
       <canvas
         ref={canvasRef}
+        className="border-4 border-cyan-400 rounded-xl shadow-lg"
         width={canvasSize}
         height={canvasSize}
-        className="border-4 border-cyan-400 rounded-xl shadow-lg"
-      ></canvas>
+      />
 
       <div className="bg-gray-800 p-6 rounded-lg shadow-md flex flex-col gap-4 w-80">
         <div className="flex flex-col">
@@ -84,16 +102,16 @@ function App() {
 
         <div className="flex flex-col gap-2 pt-4">
           <button
-            onClick={randomize}
+            onClick={reset}
             className="bg-cyan-600 hover:bg-cyan-500 text-white font-mono py-2 rounded-lg transition"
           >
-            🎲 Randomize
+            🔄 Reiniciar Simulación
           </button>
           <button
-            onClick={reset}
-            className="bg-purple-600 hover:bg-purple-500 text-white font-mono py-2 rounded-lg transition"
+            onClick={randomize}
+            className="bg-yellow-600 hover:bg-yellow-500 text-white font-mono py-2 rounded-lg transition"
           >
-            🔄 Reset
+            🎲 Randomizar Parámetros
           </button>
           <button
             onClick={toggleColor}
@@ -101,12 +119,12 @@ function App() {
           >
             🎨 Cambiar Color
           </button>
-          <button
-            onClick={biggerCanvas}
+          {/* <button
+            onClick={toggleSize}
             className="bg-green-600 hover:bg-green-500 text-white font-mono py-2 rounded-lg transition"
           >
             🖼️ {canvasSize === 200 ? "Wallpaper Mode" : "Normal Mode"}
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
@@ -114,16 +132,3 @@ function App() {
 }
 
 export default App;
-
-// Funciones de color
-const defaultColor = (a, b) => {
-  const c = Math.floor((a - b) * 255);
-  return `rgb(${c}, ${c}, ${c})`;
-};
-
-const funkyColor = (a, b) => {
-  const r = Math.floor(255 * (a * b));
-  const g = Math.floor(255 * (1 - a));
-  const bCol = Math.floor(255 * (1 - b));
-  return `rgb(${r}, ${g}, ${bCol})`;
-};
