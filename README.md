@@ -14,12 +14,11 @@ The patterns take between 2 to 4 minutes to take shape because the calculations 
 
 The Gray-Scott model was implemented in a React hook that updates the state of the canvas.
 
-$$
-∂A/∂t = Dₐ∇²A - A*B² + f*(1-A)
-$$
-$$
-∂B/∂t = Dᵦ∇²B + A*B² - (k+f)*B
-$$
+
+  ∂A/∂t = Dₐ∇²A - A*B² + f*(1-A)
+  
+  ∂B/∂t = Dᵦ∇²B + A*B² - (k+f)*B
+
 
 The basic operation of the software is understood by grasping the Laplacian operator, which acts as a mask indicating how a pixel disperses from one frame to another. With this foundation, most of the work is already done.
 
