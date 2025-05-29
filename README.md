@@ -16,9 +16,7 @@ The Gray-Scott model was implemented in a React hook that updates the state of t
 
 $$
 ∂A/∂t = Dₐ∇²A - A*B² + f*(1-A)
-$$
 
-$$
 ∂B/∂t = Dᵦ∇²B + A*B² - (k+f)*B
 $$
 
