@@ -6,7 +6,7 @@ function App() {
   const [feed, setFeed] = useState(0.055);
   const [kill, setKill] = useState(0.062);
   const [canvasSize, setCanvasSize] = useState(400);
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(3);
   const [colorMode, setColorMode] = useState("default");
   const [resetTrigger, setResetTrigger] = useState(0); // Nuevo estado para forzar reinicio
   
@@ -50,9 +50,9 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-900 flex flex-col items-center justify-center p-8 gap-8">
       <h1 className="text-4xl font-mono text-white">
-        Turing Patterns Simulator 🎨 (GPU Edition)
+        Turing Patterns Simulator (GPU version)
       </h1>
-
+      <div className="flex flex-row items-center gap-8">
       <canvas
         ref={canvasRef}
         className="border-4 border-cyan-400 rounded-xl shadow-lg"
@@ -125,6 +125,7 @@ function App() {
           >
             🖼️ {canvasSize === 200 ? "Wallpaper Mode" : "Normal Mode"}
           </button> */}
+        </div>
         </div>
       </div>
     </div>
